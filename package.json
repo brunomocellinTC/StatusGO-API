@@ -1,0 +1,27 @@
+{
+  "name": "statusgo-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "nodemon --watch .env --watch index.js --exec node index.js",
+    "dev": "npm run dev:server",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.16.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
