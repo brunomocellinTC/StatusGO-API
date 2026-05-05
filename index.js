@@ -29,8 +29,10 @@ function loadSystemsFromEnv() {
       if (Array.isArray(parsed)) {
         return parsed.map((system) => ({
           name: system.name,
+          env: system.env,
           url: system.url,
-          method: system.method || "GET"
+          method: system.method || "GET",
+          type: system.type
         }));
       }
     } catch (error) {
@@ -43,14 +45,16 @@ function loadSystemsFromEnv() {
   if (process.env.SYSTEM_NAME && process.env.SYSTEM_URL) {
     envSystems.push({
       name: process.env.SYSTEM_NAME,
+      env: process.env.SYSTEM_ENV,
       url: process.env.SYSTEM_URL,
-      method: process.env.SYSTEM_METHOD || "GET"
+      method: process.env.SYSTEM_METHOD || "GET",
+      type: process.env.SYSTEM_TYPE
     });
   }
 
   const numbered = {};
   Object.keys(process.env).forEach((key) => {
-    const match = key.match(/^SYSTEM_(NAME|URL|METHOD|AUTH_URL|AUTH_MATRICULA|AUTH_PASSWORD|AUTH_TOKEN_PATH)_(\d+)$/);
+    const match = key.match(/^SYSTEM_(NAME|ENV|URL|TYPE|METHOD|AUTH_URL|AUTH_MATRICULA|AUTH_PASSWORD|AUTH_TOKEN_PATH)_(\d+)$/);
     if (!match) return;
     const [, field, index] = match;
     numbered[index] = numbered[index] || {};
@@ -62,13 +66,42 @@ function loadSystemsFromEnv() {
     .forEach((index) => {
       const system = numbered[index];
       if (system.name && system.url) {
+        // Constrói o displayName com nome, tipo (API/Front) e ambiente (STG/PRD)
+        let displayName = system.name;
+        if (system.type) {
+          displayName += ` (${system.type})`;
+        }
+        if (system.env) {
+          displayName += ` - ${system.env}`;
+        }
+
+        // Se tem auth_url, determina automaticamente matricula e password pelo env
+        let authMatricula = system.auth_matricula;
+        let authPassword = system.auth_password;
+        
+        if (system.auth_url) {
+          // Se não especificou matricula/password individuais, usa os globais baseado no env
+          if (!authMatricula) {
+            authMatricula = system.env === 'PRD' 
+              ? process.env.AUTH_MATRICULA_PRD 
+              : process.env.AUTH_MATRICULA_STG;
+          }
+          if (!authPassword) {
+            authPassword = system.env === 'PRD' 
+              ? process.env.AUTH_PASSWORD_PRD 
+              : process.env.AUTH_PASSWORD_STG;
+          }
+        }
+
         envSystems.push({
-          name: system.name,
+          name: displayName,
+          env: system.env,
           url: system.url,
           method: system.method || "GET",
+          type: system.type,
           auth_url: system.auth_url,
-          auth_matricula: system.auth_matricula,
-          auth_password: system.auth_password,
+          auth_matricula: authMatricula,
+          auth_password: authPassword,
           auth_token_path: system.auth_token_path || "token"
         });
       }
