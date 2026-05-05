@@ -8,7 +8,23 @@ const { URL } = require("url");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permite requests sem origin (como mobile apps, Postman, etc)
+    if (!origin) return callback(null, true);
+
+    // Permite qualquer origin em desenvolvimento
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    // Em produção, permite qualquer origin (Vercel cuida do CORS via vercel.json)
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
