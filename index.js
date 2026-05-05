@@ -284,6 +284,11 @@ app.get("/check", async (req, res) => {
   res.json(results);
 });
 
-app.listen(PORT, () => {
-  module.exports = app;
-});
+module.exports = app;
+
+// Sobe servidor apenas local (não na Vercel)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
+  });
+}
