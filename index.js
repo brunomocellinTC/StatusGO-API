@@ -94,17 +94,17 @@ function loadSystemsFromEnv() {
         // Se tem auth_url, determina automaticamente matricula e password pelo env
         let authMatricula = system.auth_matricula;
         let authPassword = system.auth_password;
-        
+
         if (system.auth_url) {
           // Se não especificou matricula/password individuais, usa os globais baseado no env
           if (!authMatricula) {
-            authMatricula = system.env === 'PRD' 
-              ? process.env.AUTH_MATRICULA_PRD 
+            authMatricula = system.env === 'PRD'
+              ? process.env.AUTH_MATRICULA_PRD
               : process.env.AUTH_MATRICULA_STG;
           }
           if (!authPassword) {
-            authPassword = system.env === 'PRD' 
-              ? process.env.AUTH_PASSWORD_PRD 
+            authPassword = system.env === 'PRD'
+              ? process.env.AUTH_PASSWORD_PRD
               : process.env.AUTH_PASSWORD_STG;
           }
         }
@@ -285,5 +285,5 @@ app.get("/check", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend rodando em http://localhost:${PORT}`);
+  module.exports = app;
 });
